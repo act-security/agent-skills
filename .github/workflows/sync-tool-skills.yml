@@ -1,0 +1,34 @@
+name: sync tool skills
+
+# Each tool repo owns its skill at skills/<tool>/. This job mirrors them here so one
+# `npx skills add act-security-labs/agent-skills` installs the whole set.
+
+on:
+  schedule:
+    - cron: "37 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch skills from the tool repos
+        run: |
+          set -eu
+          for tool in iam-expand iam-shrink iam-convert iam-truth; do
+            rm -rf "skills/$tool"
+            git clone --depth 1 --filter=blob:none --sparse "https://github.com/act-security-labs/$tool" "/tmp/$tool"
+            git -C "/tmp/$tool" sparse-checkout set "skills/$tool"
+            cp -R "/tmp/$tool/skills/$tool" "skills/$tool"
+          done
+      - uses: peter-evans/create-pull-request@v7
+        with:
+          branch: sync/tool-skills
+          title: "chore: sync tool skills from their repos"
+          commit-message: "chore: sync tool skills from their repos"
+          body: "Automated mirror of skills/<tool>/ from the iam-expand, iam-shrink, iam-convert and iam-truth repos."

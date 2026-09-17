@@ -1,0 +1,33 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "DenyOutsideEU",
+      "Effect": "Deny",
+      "NotAction": [
+        "iam:*",
+        "sts:*",
+        "organizations:*",
+        "cloudfront:*",
+        "route53:*",
+        "support:*",
+        "budgets:*"
+      ],
+      "Resource": "*",
+      "Condition": {
+        "StringNotEquals": {
+          "aws:RequestedRegion": ["eu-west-1", "eu-central-1"]
+        },
+        "ArnNotLike": {
+          "aws:PrincipalArn": "arn:aws:iam::*:role/acme-break-glass"
+        }
+      }
+    },
+    {
+      "Sid": "DenyLeavingOrg",
+      "Effect": "Deny",
+      "Action": ["organizations:LeaveOrganization", "account:CloseAccount"],
+      "Resource": "*"
+    }
+  ]
+}
