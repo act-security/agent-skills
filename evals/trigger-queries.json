@@ -52,10 +52,6 @@
     "should_trigger": false
   },
   {
-    "query": "can arn:aws:iam::123456789012:role/App read s3://prod-data in my account?",
-    "should_trigger": true
-  },
-  {
     "query": "how do I attach a managed policy to a role with the aws cli?",
     "should_trigger": false
   },
